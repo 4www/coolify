@@ -3584,3 +3584,55 @@ function formatContainerStatus(string $status): string
         return str($status)->headline()->value();
     }
 }
+
+/**
+ * Extract hard-coded environment variables from docker-compose YAML.
+ *
+ * @param  string  $dockerComposeRaw  Raw YAML content
+ * @return \Illuminate\Support\Collection Collection of arrays with: key, value, comment, service_name
+ */
+function extractHardcodedEnvironmentVariables(string $dockerComposeRaw): \Illuminate\Support\Collection
+{
+    if (blank($dockerComposeRaw)) {
+        return collect([]);
+    }
+
+    try {
+        $yaml = \Symfony\Component\Yaml\Yaml::parse($dockerComposeRaw);
+    } catch (\Exception $e) {
+        // Malformed YAML - return empty collection
+        return collect([]);
+    }
+
+    $services = data_get($yaml, 'services', []);
+    if (empty($services)) {
+        return collect([]);
+    }
+
+    // Extract inline comments from raw YAML
+    $envComments = extractYamlEnvironmentComments($dockerComposeRaw);
+
+    $hardcodedVars = collect([]);
+
+    foreach ($services as $serviceName => $service) {
+        $environment = collect(data_get($service, 'environment', []));
+
+        if ($environment->isEmpty()) {
+            continue;
+        }
+
+        // Convert environment variables to key-value format
+        $environment = convertToKeyValueCollection($environment);
+
+        foreach ($environment as $key => $value) {
+            $hardcodedVars->push([
+                'key' => $key,
+                'value' => $value,
+                'comment' => $envComments[$key] ?? null,
+                'service_name' => $serviceName,
+            ]);
+        }
+    }
+
+    return $hardcodedVars;
+}
