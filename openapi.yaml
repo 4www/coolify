@@ -265,6 +265,9 @@ paths:
                 force_domain_override:
                   type: boolean
                   description: 'Force domain usage even if conflicts are detected. Default is false.'
+                use_coolify_json:
+                  type: boolean
+                  description: 'Check repository for coolify.json and apply configuration if found. Default is true.'
               type: object
       responses:
         '201':
@@ -531,6 +534,9 @@ paths:
                 force_domain_override:
                   type: boolean
                   description: 'Force domain usage even if conflicts are detected. Default is false.'
+                use_coolify_json:
+                  type: boolean
+                  description: 'Check repository for coolify.json and apply configuration if found. Default is true.'
               type: object
       responses:
         '201':
@@ -797,6 +803,9 @@ paths:
                 force_domain_override:
                   type: boolean
                   description: 'Force domain usage even if conflicts are detected. Default is false.'
+                use_coolify_json:
+                  type: boolean
+                  description: 'Check repository for coolify.json and apply configuration if found. Default is true.'
               type: object
       responses:
         '201':
